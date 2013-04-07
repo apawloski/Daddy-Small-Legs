@@ -11,7 +11,6 @@ import requests
 def main():
     url_stack = []
     visited_urls = set()
-    visited_images = set()
     bad_urls = set()
     bad_images = set()
 
@@ -19,6 +18,7 @@ def main():
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT, filename='crawl.log', filemode='w', level=logging.DEBUG)
 
+    # This base_url should be the full url to the base domain
     base_url = "http://www.example.com/"
     url_stack.append(base_url)
     
@@ -26,7 +26,7 @@ def main():
     while True:
         url = url_stack.pop()
         # Only visit link if it's on our site and we haven't visited it before
-        if 'http://' in url and 'jacquette.com' in url and url not in visited_urls:
+        if base_url in url and url not in visited_urls
             resp = requests.get(url)
             if resp.status_code == requests.codes.ok:
                 # Check for bad images on page
