@@ -3,30 +3,37 @@
 # Traverses website and generates list of broken links and broken images
 #
 
-import sys, time, logging
+import logging, re, sys, time
 
 from bs4 import BeautifulSoup
 import requests
 
 def main():
+
     url_stack = []
     visited_urls = set()
     bad_urls = set()
     bad_images = set()
 
+    # This base_url should be the full url to the base domain
+    if len(sys.argv) < 2:
+        base_url = "http://www.example.com/"
+        print 'Using hard coded domain: %s' % base_url
+    else:
+        base_url = sys.argv[1]
+        validate_url(base_url)
+
+    url_stack.append(base_url)
+
     # Set up logger
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT, filename='crawl.log', filemode='w', level=logging.DEBUG)
-
-    # This base_url should be the full url to the base domain
-    base_url = "http://www.example.com/"
-    url_stack.append(base_url)
     
     # Crawl through the site, grab links/images
     while True:
         url = url_stack.pop()
         # Only visit link if it's on our site and we haven't visited it before
-        if base_url in url and url not in visited_urls
+        if base_url in url and url not in visited_urls:
             resp = requests.get(url)
             if resp.status_code == requests.codes.ok:
                 # Check for bad images on page
@@ -98,6 +105,15 @@ def parse_for_images(resp):
 def check_img(url):
     resp = requests.get(url)
     return 'image' in resp.headers['content-type']
+
+def validate_url(url):
+    # This is a so-so regular expression used to validate the user input url
+    # We just need the url to begin with 'http://' or 'https://'
+    # This could be improved later for a deeper check
+    if re.match('https*://.*', url) is not None:
+        return True
+    else:
+        sys.exit("Invalid base url: %s" % url)
 
 if __name__ == "__main__":
     main()
